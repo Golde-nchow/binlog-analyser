@@ -1,6 +1,8 @@
 package com.netty.binlog.entity.pack;
 
+import com.netty.binlog.util.ByteUtil;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import lombok.Builder;
 import lombok.Data;
 
@@ -22,4 +24,17 @@ public class PackageData {
      * 数据包内容
      */
     private ByteBuf content;
+
+    /**
+     * 编码为 ByteBuf
+     */
+    public void encodeAsByteBuf(ByteBuf out) {
+        Integer sequenceId = header.getSequenceId();
+
+        // 头部信息4字节
+        out.writeBytes(ByteUtil.writeInt(header.getPayloadLength(), 3));
+        out.writeByte(sequenceId);
+        // 剩下就是内容
+        out.writeBytes(content);
+    }
 }

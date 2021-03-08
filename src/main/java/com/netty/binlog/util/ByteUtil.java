@@ -41,4 +41,23 @@ public class ByteUtil {
         return result;
     }
 
+    /**
+     * 将大端的数字，转为小端模式字节数据
+     * @param data 大端模式数据
+     * @param length 长度
+     * @return 小端模式字节数据
+     */
+    public static byte[] writeInt(Integer data, int length) {
+
+        if (data == null || length < 0) {
+            return new byte[0];
+        }
+
+        byte[] result = new byte[length];
+        for (int i = 0; i < length; i++) {
+            result[i] = (byte) ((data >> (8 * i)) & 0x000000FF);
+        }
+
+        return result;
+    }
 }
