@@ -1,8 +1,11 @@
 package com.netty.binlog.handler;
 
 import com.netty.binlog.constant.PackageHeaderConstant;
+import com.netty.binlog.entity.pack.PackageData;
+import com.netty.binlog.entity.pack.PackageHeader;
 import com.netty.binlog.util.ByteUtil;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 
@@ -54,5 +57,21 @@ public class BinlogDecoder extends ByteToMessageDecoder {
                         packageSequenceId)
         );
 
+        // 封装头部信息
+        PackageHeader header = PackageHeader
+                .builder()
+                .payloadLength(packagePayloadLength)
+                .sequenceId(packageSequenceId)
+                .build();
+
+        // 封装数据包信息
+        ByteBuf content = Unpooled.copiedBuffer(in.readBytes(packagePayloadLength));
+        PackageData data = PackageData
+                .builder()
+                .header(header)
+                .content(content)
+                .build();
+
+        out.add(data);
     }
 }
