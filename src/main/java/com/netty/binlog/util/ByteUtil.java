@@ -60,4 +60,37 @@ public class ByteUtil {
 
         return result;
     }
+
+    /**
+     * 获取 string<NUL> 类型的数据.
+     * 此类数据没有长度限制，直至 00 结尾，不同数据包代表不同的数据.
+     * @param buf ByteBuf 缓冲区
+     */
+    public static String readNullTerminatedString(ByteBuf buf) {
+        if (buf == null) {
+            return "";
+        }
+
+        int length = 0;
+        // 暂存读指针
+        buf.markReaderIndex();
+
+        // 遍历 byteBuf 直至 0 结尾
+        // 但是 '\0' 才代表是结束标志，才是真的 0；
+        // '0' 的ASCII 值是48.
+        byte terminatedChar = '\0';
+        while (terminatedChar != buf.readByte()) {
+            length++;
+        }
+        // 跳过 00 结束标志
+        length++;
+
+        // 重置读指针
+        buf.resetReaderIndex();
+
+        byte[] content = new byte[length];
+        buf.readBytes(content);
+
+        return new String(content, 0, length - 1);
+    }
 }
