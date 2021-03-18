@@ -17,4 +17,13 @@ public interface ClientConstant {
      */
     Integer PORT = 3306;
 
+    /**
+     * 用户名
+     */
+    String USERNAME = "root";
+
+    /**
+     * 密码
+     */
+    String PASSWORD = "root";
 }
