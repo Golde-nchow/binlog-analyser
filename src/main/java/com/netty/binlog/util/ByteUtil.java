@@ -93,4 +93,14 @@ public class ByteUtil {
 
         return new String(content, 0, length - 1);
     }
+
+    /**
+     * 写入 string<NUL> 类型的数据.
+     * 此类数据没有长度限制，直至 00 结尾，不同数据包代表不同的数据.
+     * 其实就是在最后，加一个 '0' 结束符
+     * @param value 字符串
+     */
+    public static byte[] writeNullTerminatedString(String value) {
+        return (value + "\0").getBytes();
+    }
 }
