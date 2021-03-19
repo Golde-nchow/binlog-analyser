@@ -1,5 +1,7 @@
 package com.netty.binlog.entity.autentication;
 
+import io.netty.buffer.ByteBuf;
+
 /**
  * @author by chow
  * @Description 认证方式接口
@@ -12,7 +14,7 @@ public interface AuthMethod {
      * 将认证请求包，封装为 byte[]，方便发送
      * @return 认证请求包的 byte[] 形式
      */
-    byte[] toByteArray();
+    ByteBuf toByteBuf();
 
     /**
      * 初始化认证内容

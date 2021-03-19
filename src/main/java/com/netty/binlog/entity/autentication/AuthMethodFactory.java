@@ -30,7 +30,7 @@ public class AuthMethodFactory {
      * @param authMethod 认证方法枚举类
      * @return 认证方法实现类
      */
-    AuthMethod getAuthMethodImpl(AuthMethods authMethod) {
+    public AuthMethod getAuthMethodImpl(AuthMethods authMethod) {
         // 若是 MySQL41 的认证方式
         if (authMethod.equals(AuthMethods.NATIVE)) {
             return new MySql41Authentication();
