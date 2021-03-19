@@ -1,6 +1,10 @@
 package com.netty.binlog.util;
 
 import io.netty.buffer.ByteBuf;
+import org.apache.commons.lang3.StringUtils;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * @author by chow
@@ -102,5 +106,91 @@ public class ByteUtil {
      */
     public static byte[] writeNullTerminatedString(String value) {
         return (value + "\0").getBytes();
+    }
+
+    /**
+     * 对密码进行加密，使其满足 MySql411
+     * @param password 密码
+     * @param scramble 不知道是什么，反正加密要用到
+     * @return 加密后的密码
+     */
+    public static byte[] encryptPasswordWithSha1(String password, String scramble) {
+
+        if (StringUtils.isEmpty(password)) {
+            return new byte[0];
+        }
+
+        // java.security 工具类
+        MessageDigest sha;
+        try {
+            sha = MessageDigest.getInstance("SHA-1");
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+
+        // 1、SHA1(password)
+        byte[] passwordSha1Encrypt = sha.digest(password.getBytes());
+
+        // 2、SHA1(SHA1(password))
+        byte[] passwordSha1DoubleEncrypt = sha.digest(passwordSha1Encrypt);
+
+        // 3、SHA1(challenge + SHA1(SHA1(password)))：这里指的是拼接字节数组
+        byte[] challengeAppendPasswordSha1DoubleEncrypt = byteArrAppend(scramble.getBytes(), passwordSha1DoubleEncrypt);
+
+        // 4、SHA1(password) ^ SHA1(challenge + SHA1(SHA1(password)))
+        byte[] encryptResult = byteArrayXor(password.getBytes(), challengeAppendPasswordSha1DoubleEncrypt);
+
+        // 5、HEX(SHA1(password) ^ SHA1(challenge + SHA1(SHA1(password))))
+        // 若已经是 byte[] 的，无需转换
+
+        return encryptResult;
+    }
+
+    /**
+     * byte数组拼接，主要是利用 arrayCopy 方法，这个方法在 java 源码中很常见
+     * @param firstArr 第一个 byte 数组
+     * @param secondArr 第二个 byte 数组
+     * @return 拼接后的 byte 数组
+     */
+    private static byte[] byteArrAppend(byte[] firstArr, byte[] secondArr) {
+        int firstArrLen = firstArr.length;
+        int secondArrLen = secondArr.length;
+
+        byte[] result = new byte[firstArrLen + secondArrLen];
+        System.arraycopy(firstArr, 0, result, 0, firstArrLen);
+        System.arraycopy(secondArr, 0, result, firstArrLen, result.length);
+
+        return result;
+    }
+
+    /**
+     * byte数组抑或；
+     *
+     * 1、若两个数组的长度一致，则 first[i] ^ second[i]；
+     * 2、若两个数组的长度不一致，则最少的那一方循环，直至最多的那一方遍历完，例如最多的是 first 数组：first[i] ^ second[i % second.length]
+     *
+     * @param firstArr 第一个 byte 数组
+     * @param secondArr 第二个 byte 数组
+     * @return 抑或后的 byte 数组
+     */
+    private static byte[] byteArrayXor(byte[] firstArr, byte[] secondArr) {
+
+        int firstArrLen = firstArr.length;
+        int secondArrLen = secondArr.length;
+
+        byte[] result = new byte[Math.max(firstArrLen, secondArrLen)];
+
+        if (firstArrLen > secondArrLen) {
+            for (int i = 0; i < firstArr.length; i++) {
+                result[i] = (byte) (firstArr[i] ^ secondArr[i % secondArrLen]);
+            }
+
+        } else {
+            for (int i = 0; i < firstArr.length; i++) {
+                result[i] = (byte) (secondArr[i] ^ firstArr[i % firstArrLen]);
+            }
+        }
+
+        return result;
     }
 }
