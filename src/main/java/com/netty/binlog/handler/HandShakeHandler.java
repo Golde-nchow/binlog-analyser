@@ -1,8 +1,15 @@
 package com.netty.binlog.handler;
 
+import com.netty.binlog.constant.CharsetConstant;
+import com.netty.binlog.constant.ClientConstant;
+import com.netty.binlog.entity.autentication.AuthMethod;
+import com.netty.binlog.entity.autentication.AuthMethodFactory;
 import com.netty.binlog.entity.pack.PackageData;
+import com.netty.binlog.entity.pack.PackageHeader;
+import com.netty.binlog.enumeration.AuthMethods;
 import com.netty.binlog.util.ByteUtil;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
@@ -55,17 +62,37 @@ public class HandShakeHandler extends SimpleChannelInboundHandler<PackageData> {
         // auth-plugin-data-part 第2部分
         String authPluginDataPartTwo = ByteUtil.readNullTerminatedString(content);
 
+        // auth-plugin 认证方式名称
+        String authPluginName = ByteUtil.readNullTerminatedString(content);
+
         System.out.println("协议版本：" + protocolVersion);
         System.out.println("服务器版本：" + serverVersion);
         System.out.println("连接ID：" + threadId);
         System.out.println("auth-plugin-data 第1部分：" + authPluginDataPartOne);
         System.out.println("服务器权能标志，低16位：" + capabilityFlagsLower);
+        // 若为-1，代表未知编码
         System.out.println("字符编码：" + characterSet);
         System.out.println("服务器状态标志位：" + serverStatus);
         System.out.println("服务器权能标志，高16位：" + capabilityFlagsUpper);
         System.out.println("auth-plugin-data-length：" + authPluginDataLen);
         System.out.println("auth-plugin-data 第2部分：" + authPluginDataPartTwo);
+        System.out.println("认证方式：" + authPluginName);
+
+        // auth-plugin-data第1部分 + auth-plugin-data第2部分 = auth-plugin-data = scramble
+        String scramble = authPluginDataPartOne + authPluginDataPartTwo;
 
         System.out.println("======================== 握手数据包解析完成 ================================");
+
+        // 发送身份认证信息，模拟客户端连接过程
+        AuthMethodFactory factory = new AuthMethodFactory();
+        AuthMethod nativeAuth = factory.getAuthMethodImpl(AuthMethods.NATIVE);
+        nativeAuth.init(null, ClientConstant.USERNAME, ClientConstant.PASSWORD, scramble, CharsetConstant.UTF8_GENERAL_CI);
+        // 封装头部信息、数据包信息
+        ByteBuf authRequestBuf = nativeAuth.toByteBuf();
+        PackageHeader packageHeader = PackageHeader.builder().payloadLength(authRequestBuf.readableBytes()).sequenceId(1).build();
+        PackageData packageData = PackageData.builder().header(packageHeader).content(authRequestBuf).build();
+        ctx.writeAndFlush(packageData);
+        // 握手数据包只解析一次
+        ctx.pipeline().remove(this);
     }
 }
