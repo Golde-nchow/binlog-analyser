@@ -161,7 +161,7 @@ public class ByteUtil {
         byte[] appendedByteArrayEncrypt = sha.digest(challengeAppendPasswordSha1DoubleEncrypt);
 
         // 4、SHA1(password) ^ SHA1(challenge + SHA1(SHA1(password)))
-        byte[] encryptResult = byteArrayXor(password.getBytes(), appendedByteArrayEncrypt);
+        byte[] encryptResult = byteArrayXor(passwordSha1Encrypt, appendedByteArrayEncrypt);
 
         // 5、HEX(SHA1(password) ^ SHA1(challenge + SHA1(SHA1(password))))
         // 若已经是 byte[] 的，无需转换
