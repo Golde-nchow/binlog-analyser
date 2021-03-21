@@ -158,7 +158,7 @@ public class ByteUtil {
 
         byte[] result = new byte[firstArrLen + secondArrLen];
         System.arraycopy(firstArr, 0, result, 0, firstArrLen);
-        System.arraycopy(secondArr, 0, result, firstArrLen, result.length);
+        System.arraycopy(secondArr, 0, result, firstArrLen, secondArrLen);
 
         return result;
     }
