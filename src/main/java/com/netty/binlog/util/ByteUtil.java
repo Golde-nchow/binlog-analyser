@@ -66,6 +66,28 @@ public class ByteUtil {
     }
 
     /**
+     * 读取指定字节的字符，并且拼接成字符串
+     * @param contentBuf ByteBuf 缓冲区
+     * @param length 长度
+     */
+    public static String readString(ByteBuf contentBuf, int length) {
+        byte[] stringArr = new byte[length];
+        contentBuf.readBytes(stringArr);
+        return new String(stringArr, 0, length);
+    }
+
+    /**
+     * 读取剩余字节的字符，并且拼接成字符串
+     * @param contentBuf ByteBuf 缓冲区
+     */
+    public static String readEofString(ByteBuf contentBuf) {
+        int readableBytes = contentBuf.readableBytes();
+        byte[] readableBytesArr = new byte[readableBytes];
+        contentBuf.readBytes(readableBytesArr);
+        return new String(readableBytesArr, 0, readableBytesArr.length - 1);
+    }
+
+    /**
      * 获取 string<NUL> 类型的数据.
      * 此类数据没有长度限制，直至 00 结尾，不同数据包代表不同的数据.
      * @param buf ByteBuf 缓冲区

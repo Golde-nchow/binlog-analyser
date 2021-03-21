@@ -28,9 +28,10 @@ public class ClientThread implements Runnable {
                     .handler(new ClientChannelHandler());
 
             ChannelFuture channelFuture = clientBootstrap.connect(ClientConstant.IP, ClientConstant.PORT).sync();
-            channelFuture.channel().closeFuture().sync();
 
             System.out.println("MySQL 连接成功");
+
+            channelFuture.channel().closeFuture().sync();
 
         } catch (InterruptedException e) {
             System.out.println("MySQL 连接失败");
