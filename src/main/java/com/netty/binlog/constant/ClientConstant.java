@@ -25,5 +25,5 @@ public interface ClientConstant {
     /**
      * 密码
      */
-    String PASSWORD = "root";
+    String PASSWORD = "123456";
 }
