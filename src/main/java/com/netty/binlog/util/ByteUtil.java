@@ -158,9 +158,10 @@ public class ByteUtil {
 
         // 3、SHA1(challenge + SHA1(SHA1(password)))：这里指的是拼接字节数组
         byte[] challengeAppendPasswordSha1DoubleEncrypt = byteArrAppend(scramble.getBytes(), passwordSha1DoubleEncrypt);
+        byte[] appendedByteArrayEncrypt = sha.digest(challengeAppendPasswordSha1DoubleEncrypt);
 
         // 4、SHA1(password) ^ SHA1(challenge + SHA1(SHA1(password)))
-        byte[] encryptResult = byteArrayXor(password.getBytes(), challengeAppendPasswordSha1DoubleEncrypt);
+        byte[] encryptResult = byteArrayXor(password.getBytes(), appendedByteArrayEncrypt);
 
         // 5、HEX(SHA1(password) ^ SHA1(challenge + SHA1(SHA1(password))))
         // 若已经是 byte[] 的，无需转换
