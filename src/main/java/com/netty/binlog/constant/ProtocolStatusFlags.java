@@ -8,6 +8,9 @@ import java.util.Map;
 /**
  * @author by chow
  * @Description 协议状态码
+ *
+ * Mysql 官方文档：https://dev.mysql.com/doc/dev/mysql-server/latest/mysql__com_8h.html#a1d854e841086925be1883e4d7b4e8cad
+ *
  * @date 2021/3/22 下午9:38
  */
 public class ProtocolStatusFlags {
@@ -37,15 +40,15 @@ public class ProtocolStatusFlags {
         // 0x200：SERVER_STATUS_NO_BACKSLASH_ESCAPES
         STATUS_FLAGS.put(512, "服务器状态-反斜杠被解析");
         // 0x400：SERVER_STATUS_METADATA_CHANGED
-        STATUS_FLAGS.put(1024, "服务器状态-元数据已被更改");
+        STATUS_FLAGS.put(1024, "服务器状态-发现新语句返回不同数量的结果集列");
         // 0x800：SERVER_QUERY_WAS_SLOW
         STATUS_FLAGS.put(2048, "服务器发现慢查询");
         // 0x1000：SERVER_PS_OUT_PARAMS
-        STATUS_FLAGS.put(4096, "服务器打印流输出参数");
+        STATUS_FLAGS.put(4096, "服务器结果集包含输出参数");
         // 0x2000：SERVER_STATUS_IN_TRANS_READONLY
         STATUS_FLAGS.put(8192, "服务器状态-在事务中只读");
         // 0x4000：SERVER_SESSION_STATE_CHANGED
-        STATUS_FLAGS.put(16384, "服务器会话状态已更改");
+        STATUS_FLAGS.put(16384, "服务器上的某个状态信息由于执行上一条语句而发生了更改");
     }
 
     /**
