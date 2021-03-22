@@ -46,6 +46,42 @@ public class ByteUtil {
     }
 
     /**
+     * 读取一个 lenenc 类型的数据.
+     *
+     * 若第一个数
+     * 1、< 0xfb, 那么保存为 1 字节的整数.
+     * 2、= 0xfc, 那么保存为 fc + 2字节的整数.
+     * 3、= 0xfd, 那么保存为 fd + 3字节的整数.
+     * 4、= 0xfe, 那么保存为 fe + 8字节的整数.
+     *
+     * @param byteBuf 缓冲区
+     * @return 结果
+     */
+    public static int readLenencInt(ByteBuf byteBuf) {
+
+        byte oneByteInteger = 1 << 8 - 5;
+        byte twoBytesInteger = 1 << 8 - 4;
+        byte threeBytesInteger = 1 << 8 - 3;
+        byte eightBytesInteger = 1 << 8 - 2;
+
+        byte firstByte = byteBuf.readByte();
+        if (firstByte < oneByteInteger) {
+            return firstByte;
+
+        } else if (firstByte < twoBytesInteger) {
+            return readInt(byteBuf, 2);
+
+        } else if (firstByte < threeBytesInteger) {
+            return readInt(byteBuf, 3);
+
+        } else if (firstByte < eightBytesInteger) {
+            return readInt(byteBuf, 8);
+        }
+
+        return 0;
+    }
+
+    /**
      * 将大端的数字，转为小端模式字节数据
      * @param data 大端模式数据
      * @param length 长度
@@ -82,6 +118,11 @@ public class ByteUtil {
      */
     public static String readEofString(ByteBuf contentBuf) {
         int readableBytes = contentBuf.readableBytes();
+
+        if (readableBytes == 0) {
+            return "";
+        }
+
         byte[] readableBytesArr = new byte[readableBytes];
         contentBuf.readBytes(readableBytesArr);
         return new String(readableBytesArr, 0, readableBytesArr.length - 1);
