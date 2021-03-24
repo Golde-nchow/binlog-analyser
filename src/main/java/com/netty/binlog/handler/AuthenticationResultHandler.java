@@ -1,9 +1,12 @@
 package com.netty.binlog.handler;
 
 import com.netty.binlog.constant.ProtocolStatusFlags;
+import com.netty.binlog.entity.command.TextCommand;
 import com.netty.binlog.entity.pack.PackageData;
+import com.netty.binlog.entity.pack.PackageHeader;
 import com.netty.binlog.util.ByteUtil;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
@@ -45,7 +48,14 @@ public class AuthenticationResultHandler extends SimpleChannelInboundHandler<Pac
             authFail(contentBuf);
         }
 
+        // 身份认证，认证一次即可，用完移除
+        ctx.pipeline().remove(this);
+
         System.out.println("======================== 身份认证结果解析完毕 ================================");
+
+        // 获取 binlog 信息
+        // 我们需要通过 binlog 信息来再发送 BINLOG_DUMP 命令，不断获取 binlog 的网络流
+        fetchBinlogInfo(ctx);
 
     }
 
@@ -100,5 +110,39 @@ public class AuthenticationResultHandler extends SimpleChannelInboundHandler<Pac
         System.out.println("sql状态标记：" + sqlStateMarker);
         System.out.println("sql状态：" + sqlState);
         System.out.println("错误信息：" + errorMsg);
+    }
+
+    /**
+     * 获取二进制文件信息，例如 fileName, position
+     * 目前要简单地向 MySQL 发送命令，使用的是 TEXT_PROTOCOL 文本协议.
+     *
+     * 详见官方文档：
+     * 1、所有命令类型：https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_command_phase.html
+     * 2、【用到的】文本协议类型命令：https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_query.html
+     *
+     * 这里需要注意的是，这个查询的包是不需要序列号的，只需要有效载荷长度.
+     *
+     * 这个问题，折腾了很久，最后查询了旧官方文档才知道，有点坑：
+     * https://dev.mysql.com/doc/internals/en/com-query.html
+     *
+     * @param ctx 管道处理器上下文
+     */
+    private void fetchBinlogInfo(ChannelHandlerContext ctx) {
+
+        ByteBuf textCommandBuf = new TextCommand("select @@version comment limit 1").toByteBuf();
+
+        PackageHeader packageHeader = PackageHeader
+                .builder()
+                .payloadLength(textCommandBuf.readableBytes())
+                .sequenceId(0)
+                .build();
+
+        PackageData data = PackageData
+                .builder()
+                .header(packageHeader)
+                .content(textCommandBuf)
+                .build();
+
+        ctx.writeAndFlush(data);
     }
 }
