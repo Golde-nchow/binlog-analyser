@@ -120,16 +120,16 @@ public class AuthenticationResultHandler extends SimpleChannelInboundHandler<Pac
      * 1、所有命令类型：https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_command_phase.html
      * 2、【用到的】文本协议类型命令：https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_query.html
      *
-     * 这里需要注意的是，这个查询的包是不需要序列号的，只需要有效载荷长度.
+     * 这里需要注意的是，这个查询的包的序列号是0，代表这是一个交互的开始.
      *
-     * 这个问题，折腾了很久，最后查询了旧官方文档才知道，有点坑：
+     * 这个问题，折腾了很久，最后研究了旧官方文档才知道，自己的基础不扎实：
      * https://dev.mysql.com/doc/internals/en/com-query.html
      *
      * @param ctx 管道处理器上下文
      */
     private void fetchBinlogInfo(ChannelHandlerContext ctx) {
 
-        ByteBuf textCommandBuf = new TextCommand("select @@version comment limit 1").toByteBuf();
+        ByteBuf textCommandBuf = new TextCommand("show master status").toByteBuf();
 
         PackageHeader packageHeader = PackageHeader
                 .builder()

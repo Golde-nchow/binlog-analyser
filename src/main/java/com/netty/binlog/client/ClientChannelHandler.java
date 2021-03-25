@@ -1,9 +1,6 @@
 package com.netty.binlog.client;
 
-import com.netty.binlog.handler.AuthenticationResultHandler;
-import com.netty.binlog.handler.BinlogDecoder;
-import com.netty.binlog.handler.BinlogEncoder;
-import com.netty.binlog.handler.HandShakeHandler;
+import com.netty.binlog.handler.*;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -22,5 +19,6 @@ public class ClientChannelHandler extends ChannelInitializer<SocketChannel> {
         pipeline.addLast("encoder", new BinlogEncoder());
         pipeline.addLast("HandShakeHandler", new HandShakeHandler());
         pipeline.addLast("AuthenticationResultHandler", new AuthenticationResultHandler());
+        pipeline.addLast("fetchBinlogInfoHandler", new FetchBinlogHandler());
     }
 }
