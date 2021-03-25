@@ -15,7 +15,7 @@ public class ClientChannelHandler extends ChannelInitializer<SocketChannel> {
     @Override
     protected void initChannel(SocketChannel channel) throws Exception {
         ChannelPipeline pipeline = channel.pipeline();
-        pipeline.addLast("decoder", new BinlogDecoder());
+        pipeline.addLast("decoder", new BinlogDecoder(1024 * 1024 * 300));
         pipeline.addLast("encoder", new BinlogEncoder());
         pipeline.addLast("HandShakeHandler", new HandShakeHandler());
         pipeline.addLast("AuthenticationResultHandler", new AuthenticationResultHandler());

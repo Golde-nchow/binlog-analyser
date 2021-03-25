@@ -8,6 +8,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.handler.codec.FixedLengthFrameDecoder;
 
 import java.util.List;
 
@@ -22,14 +23,19 @@ import java.util.List;
  * 有效载荷内容长度 = payload_length；
  *
  * 由于从网络接收到的都是字节，所以需要从字节转 POJO 对象；
- * 所以继承的是 ByteToMessageDecoder
+ * 但是由于 MySQL 在响应的时候，经常拆包发送，所以会导致一下子收到几个数据包，处理起来很不方便。
+ * 所以就使用了 FixedLengthFrameDecoder 解决拆包问题。
  *
  * @date 2021/3/6 下午3:37
  */
-public class BinlogDecoder extends ByteToMessageDecoder {
+public class BinlogDecoder extends FixedLengthFrameDecoder {
+
+    public BinlogDecoder(int frameLength) {
+        super(frameLength);
+    }
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+    protected void callDecode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
 
         if (in == null || in.readableBytes() < PackageHeaderConstant.HEADER_LENGTH) {
             return;
