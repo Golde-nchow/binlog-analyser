@@ -86,7 +86,7 @@ public class HandShakeHandler extends SimpleChannelInboundHandler<PackageData> {
         // 发送身份认证信息，模拟客户端连接过程
         AuthMethodFactory factory = new AuthMethodFactory();
         AuthMethod nativeAuth = factory.getAuthMethodImpl(AuthMethods.NATIVE);
-        nativeAuth.init(null, ClientConstant.USERNAME, ClientConstant.PASSWORD, scramble, CharsetConstant.UTF8_GENERAL_CI);
+        nativeAuth.init(null, ClientConstant.USERNAME, ClientConstant.PASSWORD, scramble, CharsetConstant.UTF8_GENERAL_CI.ordinal() + 1);
         // 封装头部信息、数据包信息
         ByteBuf authRequestBuf = nativeAuth.toByteBuf();
         PackageHeader packageHeader = PackageHeader.builder().payloadLength(authRequestBuf.readableBytes()).sequenceId(1).build();

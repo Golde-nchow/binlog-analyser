@@ -59,12 +59,12 @@ public class ByteUtil {
      */
     public static int readLenencInt(ByteBuf byteBuf) {
 
-        byte oneByteInteger = 1 << 8 - 5;
-        byte twoBytesInteger = 1 << 8 - 4;
-        byte threeBytesInteger = 1 << 8 - 3;
-        byte eightBytesInteger = 1 << 8 - 2;
+        int oneByteInteger = (1 << 8) - 5;
+        int twoBytesInteger = (1 << 8) - 4;
+        int threeBytesInteger = (1 << 8) - 3;
+        int eightBytesInteger = (1 << 8) - 2;
 
-        byte firstByte = byteBuf.readByte();
+        int firstByte = byteBuf.readByte();
         if (firstByte < oneByteInteger) {
             return firstByte;
 
@@ -159,6 +159,16 @@ public class ByteUtil {
         buf.readBytes(content);
 
         return new String(content, 0, length - 1);
+    }
+
+    /**
+     * 获取 string<Lenenc> 类型的数据.
+     * 最前面有一个 int<lenenc> 的数据，告知我们后面字符串的字节长度是多少.
+     * @param buf ByteBuf 缓冲区
+     */
+    public static String readLenencString(ByteBuf buf) {
+        int length = readLenencInt(buf);
+        return readString(buf, length);
     }
 
     /**
