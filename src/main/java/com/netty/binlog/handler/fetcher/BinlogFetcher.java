@@ -1,7 +1,7 @@
 package com.netty.binlog.handler.fetcher;
 
+import com.netty.binlog.constant.BinlogConstant;
 import com.netty.binlog.entity.command.TextCommand;
-import com.netty.binlog.entity.pack.BinlogMainData;
 import com.netty.binlog.entity.pack.PackageData;
 import com.netty.binlog.entity.pack.PackageHeader;
 import com.netty.binlog.util.ByteUtil;
@@ -21,11 +21,6 @@ import java.util.Map;
  */
 @Setter
 public class BinlogFetcher extends AbstractFetcher {
-
-    /**
-     * binlog 本地缓存数据
-     */
-    private ThreadLocal<BinlogMainData> binlogData = new ThreadLocal<>();
 
     /**
      * 获取 serverId
@@ -69,11 +64,10 @@ public class BinlogFetcher extends AbstractFetcher {
 
             // TODO：这里需要优化下，因为贪图方便，属性值的位置写死，应该转换为 Map 进行一一对应
             if (index == 1) {
-                binlogData.set(BinlogMainData.builder().binlogFileName(fieldValue).build());
+                BinlogConstant.BIN_LOG_FILE_NAME = fieldValue;
 
             } else if (index == 2) {
-                BinlogMainData binlogMainData = binlogData.get();
-                binlogMainData.setPosition(fieldValue);
+                BinlogConstant.BIN_LOG_FILE_POSITION = fieldValue;
             }
             index++;
         }
@@ -90,6 +84,6 @@ public class BinlogFetcher extends AbstractFetcher {
 
         // 若完成返回结果的解析，那么就发起 BINLOG_DUMP 请求，开始监听
         // 但是由于还缺少 server_id 参数，所以就发起获取 server_id 请求
-        // fetchServerId(getCtx());
+         fetchServerId(getCtx());
     }
 }
