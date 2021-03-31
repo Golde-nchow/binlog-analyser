@@ -23,5 +23,6 @@ public class ClientChannelHandler extends ChannelInitializer<SocketChannel> {
         pipeline.addLast("AuthenticationResultHandler", new AuthenticationResultHandler());
         pipeline.addLast("fetchBinlogInfoHandler", new FetcherHandler(new BinlogFetcher()));
         pipeline.addLast("fetchServerIdHandler", new FetcherHandler(new ServerIdFetcher()));
+        pipeline.addLast("binlogEventParserHandler", new BinlogEventParserHandler());
     }
 }
