@@ -16,6 +16,7 @@ public class EventParserFactory {
 
     static {
         parserMap.put(EventType.FORMAT_DESCRIPTION_EVENT.ordinal(), new FormatDescriptionEventParser());
+        parserMap.put(EventType.ROTATE_EVENT.ordinal(), new RotateEventParser());
     }
 
     /**
