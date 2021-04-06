@@ -1,5 +1,6 @@
 package com.netty.binlog.event;
 
+import com.netty.binlog.entity.pack.EventHeader;
 import com.netty.binlog.util.ByteUtil;
 import io.netty.buffer.ByteBuf;
 
@@ -14,7 +15,7 @@ import java.time.ZoneOffset;
 public class FormatDescriptionEventParser implements IEventParser {
 
     @Override
-    public void parse(ByteBuf content) {
+    public void parse(EventHeader eventHeader, ByteBuf content) {
 
         // binlog 版本
         int binlogVersion = ByteUtil.readInt(content, 2);

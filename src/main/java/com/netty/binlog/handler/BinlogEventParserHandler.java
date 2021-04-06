@@ -58,7 +58,7 @@ public class BinlogEventParserHandler extends SimpleChannelInboundHandler<Packag
         if (eventParser == null) {
             System.out.println("遇到不支持的事件类型");
         } else {
-            eventParser.parse(content);
+            eventParser.parse(eventHeader, content);
         }
     }
 }

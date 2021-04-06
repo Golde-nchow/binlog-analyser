@@ -1,6 +1,7 @@
 package com.netty.binlog.event;
 
 import com.netty.binlog.constant.BinlogConstant;
+import com.netty.binlog.entity.pack.EventHeader;
 import com.netty.binlog.util.ByteUtil;
 import io.netty.buffer.ByteBuf;
 import lombok.Data;
@@ -18,7 +19,7 @@ public class RotateEventParser implements IEventParser {
      * @param content 缓冲区
      */
     @Override
-    public void parse(ByteBuf content) {
+    public void parse(EventHeader eventHeader, ByteBuf content) {
         // 切换的 binlog 位置
         int position = ByteUtil.readInt(content, 8);
         // 切换的 binlog 文件名
