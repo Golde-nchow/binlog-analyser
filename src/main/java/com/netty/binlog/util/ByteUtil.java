@@ -125,7 +125,7 @@ public class ByteUtil {
 
         byte[] readableBytesArr = new byte[readableBytes];
         contentBuf.readBytes(readableBytesArr);
-        return new String(readableBytesArr, 0, readableBytesArr.length - 1);
+        return new String(readableBytesArr, 0, readableBytesArr.length);
     }
 
     /**
