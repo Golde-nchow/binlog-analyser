@@ -24,7 +24,8 @@ public class FormatDescriptionEventParser implements IEventParser {
         String mysqlServerVersion = ByteUtil.readString(content, 50);
 
         // 创建时间
-        int createTimestamp = ByteUtil.readInt(content, 4);
+        int createTimestamp = eventHeader.getTimestamp();
+        content.skipBytes(4);
 
         // 事件头部长度
         int eventHeaderLength = content.readByte();
