@@ -54,7 +54,7 @@ public class ServerIdFetcher extends AbstractFetcher {
                 .builder()
                 .status(CommandTypes.BINLOG_DUMP.ordinal())
                 .binlogPos(Integer.parseInt(BinlogConstant.BIN_LOG_FILE_POSITION))
-                .flags(1)
+                .flags(0)
                 .serverId(Integer.parseInt(BinlogConstant.SERVER_ID))
                 .binlogFileName(BinlogConstant.BIN_LOG_FILE_NAME)
                 .build()
