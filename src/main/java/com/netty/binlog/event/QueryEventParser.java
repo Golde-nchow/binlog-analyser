@@ -7,6 +7,9 @@ import io.netty.buffer.ByteBuf;
 /**
  * @author by chow
  * @Description 查询事件
+ *
+ * 官方文档：https://dev.mysql.com/doc/internals/en/query-event.html
+ *
  * @date 2021/4/1 下午11:07
  */
 public class QueryEventParser implements IEventParser {
@@ -27,6 +30,7 @@ public class QueryEventParser implements IEventParser {
         int errorCode = ByteUtil.readInt(content, 2);
         // status_vars 长度
         int statusVarsLength = ByteUtil.readInt(content, 2);
+        content.skipBytes(statusVarsLength);
 
         System.out.println("sql 执行时间：" + executionTime);
         System.out.println("数据库长度：" + schemaLength);
@@ -35,8 +39,8 @@ public class QueryEventParser implements IEventParser {
         // 计算 sql 长度，官方文档：事件头部的事件长度 - 当前读位置
         int sqlLength = eventHeader.getEventSize() - content.readerIndex();
         System.out.println("数据库名称：" + ByteUtil.readString(content, schemaLength));
-        System.out.println("执行的 sql：" + ByteUtil.readString(content, sqlLength));
+        System.out.println("执行的 sql：" + ByteUtil.readEofString(content));
 
-        System.out.println("========================== 查询事件解析完成 ==========================");
+        System.out.println("========================== QUERY 查询事件解析完成 ==========================");
     }
 }
