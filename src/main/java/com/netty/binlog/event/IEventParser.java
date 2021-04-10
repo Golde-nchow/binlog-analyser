@@ -1,7 +1,6 @@
 package com.netty.binlog.event;
 
 import com.netty.binlog.entity.pack.EventHeader;
-import com.netty.binlog.entity.pack.PackageHeader;
 import io.netty.buffer.ByteBuf;
 
 /**

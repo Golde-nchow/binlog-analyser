@@ -18,6 +18,8 @@ public class EventParserFactory {
         parserMap.put(EventType.FORMAT_DESCRIPTION_EVENT.ordinal(), new FormatDescriptionEventParser());
         parserMap.put(EventType.ROTATE_EVENT.ordinal(), new RotateEventParser());
         parserMap.put(EventType.QUERY_EVENT.ordinal(), new QueryEventParser());
+        parserMap.put(EventType.TABLE_MAP_EVENT.ordinal(), new TableMapEventParser());
+        parserMap.put(EventType.WRITE_ROWS_EVENT_V2.ordinal(), new WriteRowsEventV2());
     }
 
     /**
