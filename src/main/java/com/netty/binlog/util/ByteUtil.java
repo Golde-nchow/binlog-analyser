@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.BitSet;
 
 /**
  * @author by chow
@@ -110,6 +111,38 @@ public class ByteUtil {
         byte[] stringArr = new byte[length];
         contentBuf.readBytes(stringArr);
         return new String(stringArr, 0, length);
+    }
+
+    /**
+     * 读取 BitSet 数据
+     * @param contentBuf 缓冲区
+     * @param columnCount 列数量
+     * @return BitSet
+     */
+    public static BitSet readBitSet(ByteBuf contentBuf, int columnCount) {
+        // 这里需要经过，处理，是因为 bitmap 是使用位进行判断的
+        // 一个字节是 8 位，所以一个字节只能代表 1111 1111，8个字段的长度
+        // 若有 9 个字段，则需要使用两个字节
+        int length = (columnCount + 7) >> 3;
+        // 获取内容
+        int[] bytes = new int[length];
+        for (int i = 0; i < bytes.length; i++) {
+            bytes[i] = readInt(contentBuf, 1);
+        }
+
+        // 结果
+        BitSet bitSet = new BitSet(columnCount);
+        int bitSetIndex = 0;
+        for (int b : bytes) {
+            while (b > 0) {
+                if ((b & 1) == 1) {
+                    bitSet.set(bitSetIndex);
+                }
+                bitSetIndex++;
+                b >>>= 1;
+            }
+        }
+        return bitSet;
     }
 
     /**
