@@ -69,7 +69,12 @@ public enum EventType {
     XID_EVENT,
     BEGIN_LOAD_QUERY_EVENT,
     EXECUTE_LOAD_QUERY_EVENT,
+
+    /**
+     * 获取数据表-数据结构事件
+     */
     TABLE_MAP_EVENT,
+
     PRE_GA_WRITE_ROWS_EVENT,
     PRE_GA_UPDATE_ROWS_EVENT,
     PRE_GA_DELETE_ROWS_EVENT,
@@ -80,7 +85,13 @@ public enum EventType {
     HEARTBEAT_LOG_EVENT,
     IGNORABLE_LOG_EVENT,
     ROWS_QUERY_LOG_EVENT,
-    EXT_WRITE_ROWS_EVENT,
+
+    /**
+     * RBR（ Row-Based Replication ）模式的写入事件
+     * MySQL 5.6.x+
+     */
+    WRITE_ROWS_EVENT_V2,
+
     EXT_UPDATE_ROWS_EVENT,
     EXT_DELETE_ROWS_EVENT,
     GTID_LOG_EVENT,
