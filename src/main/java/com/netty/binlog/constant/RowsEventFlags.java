@@ -48,7 +48,7 @@ public enum RowsEventFlags {
      * @param index 索引
      * @return 描述
      */
-    public String getDesc(Integer index) {
+    public static String getDesc(Integer index) {
         RowsEventFlags[] values = values();
         return values[index].desc;
     }
