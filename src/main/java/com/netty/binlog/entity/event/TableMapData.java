@@ -15,7 +15,7 @@ public class TableMapData implements Serializable {
     /**
      * 表 id
      */
-    private long tableId;
+    private Integer tableId;
 
     /**
      * 所在数据库

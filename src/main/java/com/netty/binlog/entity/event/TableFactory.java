@@ -13,14 +13,14 @@ public class TableFactory {
     /**
      * 全局数据表暂存
      */
-    private static Map<Long, TableMapData> tables = new ConcurrentHashMap<>();
+    private static Map<Integer, TableMapData> tables = new ConcurrentHashMap<>();
 
     /**
      * 通过 table_id，获取数据表结构
      * @param tableId 表 id
      * @return 数据表结构
      */
-    public static synchronized TableMapData getByTableId(Long tableId) {
+    public static synchronized TableMapData getByTableId(Integer tableId) {
         return tables.get(tableId);
     }
 
