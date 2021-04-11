@@ -65,14 +65,15 @@ public class TableMapEventParser implements IEventParser {
         BitSet nullBitmap = ByteUtil.readBitSet(content, columnCount);
 
         // 放入全局信息
-        TableMapData tableMapData = new TableMapData();
-        tableMapData.setTableId(tableId);
-        tableMapData.setDatabase(database);
-        tableMapData.setTable(table);
         TableMapMetaData tableMapMetaData = new TableMapMetaData();
         tableMapMetaData.setColumnTypes(defTypeArr);
         tableMapMetaData.setNullBitMap(nullBitmap);
         tableMapMetaData.setColumnMetadataLen(metaDataDefLenArr);
+        TableMapData tableMapData = new TableMapData();
+        tableMapData.setTableId(tableId);
+        tableMapData.setDatabase(database);
+        tableMapData.setTable(table);
+        tableMapData.setTableMapMetadata(tableMapMetaData);
         TableFactory.setByTable(tableMapData);
 
         System.out.println("表id：" + tableId);
