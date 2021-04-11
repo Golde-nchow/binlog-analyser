@@ -1,10 +1,13 @@
 package com.netty.binlog.constant;
 
+import lombok.Getter;
+
 /**
  * @author by chow
  * @Description 表-字段类型
  * @date 2021/4/11 下午3:29
  */
+@Getter
 public enum TableColumnType {
 
     /**
@@ -167,6 +170,10 @@ public enum TableColumnType {
 
     TableColumnType(int code) {
         this.code = code;
+    }
+
+    public int getCode() {
+        return this.code;
     }
 
     /**
