@@ -1,6 +1,9 @@
 package com.netty.binlog.event;
 
-import com.netty.binlog.constant.RowsEventFlags;
+import com.netty.binlog.constant.TableColumnMetaLen;
+import com.netty.binlog.entity.event.TableFactory;
+import com.netty.binlog.entity.event.TableMapData;
+import com.netty.binlog.entity.event.TableMapMetaData;
 import com.netty.binlog.entity.pack.EventHeader;
 import com.netty.binlog.util.ByteUtil;
 import io.netty.buffer.ByteBuf;
@@ -56,13 +59,24 @@ public class TableMapEventParser implements IEventParser {
         byte[] defTypeArr = ByteUtil.readString(content, columnCount).getBytes();
 
         // 列数量长度字节（n个1字节）：定义的列长度
-        int[] metaDataDefLenArr = readMetaDataDefLen(content);
+        int[] metaDataDefLenArr = readMetaDataDefLen(content, defTypeArr);
 
         // null_bitmap[len=(列数量长度 + 8) / 7]：若某个列可为 NULL，则记录 1
         BitSet nullBitmap = ByteUtil.readBitSet(content, columnCount);
 
+        // 放入全局信息
+        TableMapData tableMapData = new TableMapData();
+        tableMapData.setTableId(tableId);
+        tableMapData.setDatabase(database);
+        tableMapData.setTable(table);
+        TableMapMetaData tableMapMetaData = new TableMapMetaData();
+        tableMapMetaData.setColumnTypes(defTypeArr);
+        tableMapMetaData.setNullBitMap(nullBitmap);
+        tableMapMetaData.setColumnMetadataLen(metaDataDefLenArr);
+        TableFactory.setByTable(tableMapData);
+
         System.out.println("表id：" + tableId);
-        System.out.println("flags：" + RowsEventFlags.getDesc(flags));
+        System.out.println("flags：" + flags);
         System.out.println("数据库名称：" + database);
         System.out.println("数据表名称：" + table);
         System.out.println("定义的列类型：" + Arrays.toString(defTypeArr));
@@ -80,26 +94,27 @@ public class TableMapEventParser implements IEventParser {
 
     /**
      * 读取各个列的定义长度
+     * @param defTypeArr 列类型
      * @param byteBuf 缓冲区
      * @return 各个列定义长度
      */
-    private int[] readMetaDataDefLen(ByteBuf byteBuf) {
+    private int[] readMetaDataDefLen(ByteBuf byteBuf, byte[] defTypeArr) {
+
         int index = 0;
-        int metaDataDefLen = ByteUtil.readInt(byteBuf, 1);
-        int[] defMetaDataLen = new int[metaDataDefLen];
+        int[] metadataDefLen = new int[defTypeArr.length];
 
-        if (metaDataDefLen == 0) {
-            return defMetaDataLen;
+        int metaDataDefCount = ByteUtil.readInt(byteBuf, 1);
+        if (metaDataDefCount == 0) {
+            return metadataDefLen;
         }
 
-        while (metaDataDefLen > 0) {
-            defMetaDataLen[index] = ByteUtil.readInt(byteBuf, 1);
-
+        for (byte b : defTypeArr) {
+            int len = TableColumnMetaLen.getMetaLenByCode(b);
+            metadataDefLen[index] = len == 0 ? 0 : ByteUtil.readInt(byteBuf, len);
             index++;
-            metaDataDefLen--;
         }
 
-        return defMetaDataLen;
+        return metadataDefLen;
     }
 
 }
