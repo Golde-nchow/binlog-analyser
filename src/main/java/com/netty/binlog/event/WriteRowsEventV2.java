@@ -61,10 +61,10 @@ public class WriteRowsEventV2 extends AbstractRowsEventDataParser implements IEv
         System.out.println("RBR-V2-写事件-头部：extraData：" + Arrays.toString(extraData));
 
         System.out.println("RBR-V2-写事件-内容：列数量：" + columnCount);
-        System.out.println("RBR-V2-写事件-内容：columns-present-bitmap：" + columnsPresentBitmap.toString());
+        System.out.println("RBR-V2-写事件-内容：columns-present-bitmap：" + Arrays.toString(parseBitSetToArr(columnsPresentBitmap, columnCount)));
 
         System.out.println("RBR-V2-写事件-行信息：");
-        parseRow(content, tableId, extraDataLen);
+        parseRow(content, tableId);
 
         System.out.println("======================== RBR-V2-写事件解析完成 ===========================");
     }
