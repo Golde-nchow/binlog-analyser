@@ -14,7 +14,7 @@ import java.util.BitSet;
  * @Description MySQL 5.6+ 的 RBR 模式写入事件
  * @date 2021/4/6 下午9:17
  */
-public class WriteRowsEventV2 extends AbstractRowsEventDataParser implements IEventParser {
+public class WriteRowsEventV2Parser extends AbstractRowsEventDataParser implements IEventParser {
 
     /**
      * 执行解析
