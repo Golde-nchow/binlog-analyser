@@ -21,9 +21,8 @@ public abstract class AbstractRowsEventDataParser {
      * 解析列数据
      * @param byteBuf byteBuf 缓冲区
      * @param tableId table_id
-     * @param actualColumnCount 实际拥有值的字段数量
      */
-    protected void parseRow(ByteBuf byteBuf, Integer tableId, int actualColumnCount) {
+    protected void parseRow(ByteBuf byteBuf, Integer tableId) {
         TableMapData tableMapData = TableFactory.getByTableId(tableId);
         TableMapMetaData tableMapMetadata = tableMapData.getTableMapMetadata();
         int[] columnMetadataLen = tableMapData.getTableMapMetadata().getColumnMetadataLen();
@@ -31,13 +30,18 @@ public abstract class AbstractRowsEventDataParser {
         // 各个字段类型
         byte[] columnTypes = tableMapMetadata.getColumnTypes();
         // null-column-bitmap
-        BitSet nullColumnBitmap = ByteUtil.readBitSet(byteBuf, columnMetadataLen.length);
+        // 若不位 null，则在 bitmap 中是 0
+        BitSet nullColumnBitmap = ByteUtil.readBitSet(byteBuf, columnTypes.length);
 
-        for (int i = 0; i < actualColumnCount; i++) {
+        for (int i = 0; i < columnTypes.length; i++) {
             // 字段类型
             int type = columnTypes[i];
             // 字段定义的长度
             int metaDefLen = columnMetadataLen[i];
+            // 判断字段是否为空
+            if (nullColumnBitmap.get(i)) {
+                continue;
+            }
 
             IColumnParser columnParser = ColumnParserFactory.getParserByColumnType(type);
             if (columnParser != null) {
@@ -45,6 +49,21 @@ public abstract class AbstractRowsEventDataParser {
                 System.out.println("第 " + (i + 1) + " 个字段的值为：" + columnValue);
             }
         }
+    }
+
+    /**
+     * 将 bitSet 转换为 boolean 数组
+     * @param bitSet bitSet
+     * @param columnCount 列数量
+     * @return boolean 数组
+     */
+    protected boolean[] parseBitSetToArr(BitSet bitSet, int columnCount) {
+        boolean[] nullBitmapArr = new boolean[columnCount];
+        for (int i = 0; i < columnCount; i++) {
+            boolean canBeNull = bitSet.get(i);
+            nullBitmapArr[i] = canBeNull;
+        }
+        return nullBitmapArr;
     }
 
 }
