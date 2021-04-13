@@ -92,8 +92,17 @@ public enum EventType {
      */
     WRITE_ROWS_EVENT_V2,
 
-    EXT_UPDATE_ROWS_EVENT,
-    EXT_DELETE_ROWS_EVENT,
+    /**
+     * RBR（ Row-Based Replication ）模式的更新事件
+     * MySQL 5.6.x+
+     */
+    UPDATE_ROWS_EVENT_v2,
+
+    /**
+     * RBR（ Row-Based Replication ）模式的写入事件
+     * MySQL 5.6.x+
+     */
+    DELETE_ROWS_EVENT_V2,
     GTID_LOG_EVENT,
     ANONYMOUS_GTID_LOG_EVENT,
     PREVIOUS_GTIDS_LOG_EVENT,

@@ -1,8 +1,9 @@
-package com.netty.binlog.event;
+package com.netty.binlog.event.row;
 
 import com.netty.binlog.constant.RowsEventFlags;
 import com.netty.binlog.entity.event.rows.AbstractRowsEventDataParser;
 import com.netty.binlog.entity.pack.EventHeader;
+import com.netty.binlog.event.IEventParser;
 import com.netty.binlog.util.ByteUtil;
 import io.netty.buffer.ByteBuf;
 
@@ -11,10 +12,10 @@ import java.util.BitSet;
 
 /**
  * @author by chow
- * @Description MySQL 5.6+ 的 RBR 模式写入事件
- * @date 2021/4/6 下午9:17
+ * @Description 删除行事件 V2 解析器
+ * @date 2021/4/12 下午10:27
  */
-public class WriteRowsEventV2Parser extends AbstractRowsEventDataParser implements IEventParser {
+public class DeleteRowsEventV2Parser extends AbstractRowsEventDataParser implements IEventParser {
 
     /**
      * 执行解析
@@ -23,6 +24,7 @@ public class WriteRowsEventV2Parser extends AbstractRowsEventDataParser implemen
      */
     @Override
     public void parse(EventHeader eventHeader, ByteBuf content) {
+
         // ======================== 头部信息 ===============================
         // 6字节：table_id
         int tableId = ByteUtil.readInt(content, 6);
@@ -50,22 +52,23 @@ public class WriteRowsEventV2Parser extends AbstractRowsEventDataParser implemen
         BitSet columnsPresentBitmap = ByteUtil.readBitSet(content, columnCount);
 
         // ======================== 行信息 ===============================
-        // bitmap：extra-data：空视图；(length(columns-present-bitmap1) + 7) / 8
-
         // 表视图的每个列的值
-        // bitmap：空视图；(length(columns-present-bitmap2) + 7) / 8
+        // bitmap：空视图；(length(columns-present-bitmap1) + 7) / 8
 
-        System.out.println("RBR-V2-写事件-头部：tableId：" + tableId);
-        System.out.println("RBR-V2-写事件-头部：flags：" + RowsEventFlags.getDesc(flags));
-        System.out.println("RBR-V2-写事件-头部：extraDataLen：" + extraDataLen);
-        System.out.println("RBR-V2-写事件-头部：extraData：" + Arrays.toString(extraData));
+        // 通过字段的类型，获取表视图中，每个内容不为空的字段占用的字节，从而获取对应值
 
-        System.out.println("RBR-V2-写事件-内容：列数量：" + columnCount);
-        System.out.println("RBR-V2-写事件-内容：columns-present-bitmap：" + Arrays.toString(parseBitSetToArr(columnsPresentBitmap, columnCount)));
+        System.out.println("RBR-V2-删除事件-头部：tableId：" + tableId);
+        System.out.println("RBR-V2-删除事件-头部：flags：" + RowsEventFlags.getDesc(flags));
+        System.out.println("RBR-V2-删除事件-头部：extraDataLen：" + extraDataLen);
+        System.out.println("RBR-V2-删除事件-头部：extraData：" + Arrays.toString(extraData));
 
-        System.out.println("RBR-V2-写事件-行信息：");
+        System.out.println("RBR-V2-删除事件-内容：列数量：" + columnCount);
+        System.out.println("RBR-V2-删除事件-内容：columns-present-bitmap：" + Arrays.toString(parseBitSetToArr(columnsPresentBitmap, columnCount)));
+
+        System.out.println("RBR-V2-删除事件-行信息：");
         parseRow(content, tableId);
 
-        System.out.println("======================== RBR-V2-写事件解析完成 ===========================");
+
+        System.out.println("======================== RBR-V2-删除事件解析完成 ===========================");
     }
 }

@@ -1,6 +1,9 @@
 package com.netty.binlog.event;
 
 import com.netty.binlog.constant.EventType;
+import com.netty.binlog.event.row.DeleteRowsEventV2Parser;
+import com.netty.binlog.event.row.UpdateRowsEventV2Parser;
+import com.netty.binlog.event.row.WriteRowsEventV2Parser;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -20,6 +23,8 @@ public class EventParserFactory {
         parserMap.put(EventType.QUERY_EVENT.ordinal(), new QueryEventParser());
         parserMap.put(EventType.TABLE_MAP_EVENT.ordinal(), new TableMapEventParser());
         parserMap.put(EventType.WRITE_ROWS_EVENT_V2.ordinal(), new WriteRowsEventV2Parser());
+        parserMap.put(EventType.DELETE_ROWS_EVENT_V2.ordinal(), new DeleteRowsEventV2Parser());
+        parserMap.put(EventType.UPDATE_ROWS_EVENT_v2.ordinal(), new UpdateRowsEventV2Parser());
     }
 
     /**
